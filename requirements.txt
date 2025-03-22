@@ -1,0 +1,7 @@
+#Use these commands, if you don't trust me then search up pyqt, numpy, and pandas
+#UPDATE as necessary
+
+
+pip install PyQt6
+pip install pandas,numpy
+
