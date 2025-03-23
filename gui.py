@@ -1,3 +1,5 @@
+### INTRO
+
 #Here is not where the logic is, but how we display it
 
 #We want buttons, which can show where to look IE ports, timestamps, packet numbers, types
@@ -5,76 +7,165 @@
 
 #This is just what I am writing, so feel free to change this as necessary
 
+#This is a prototype, feel free to change this as necessary.
 
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget, QLabel
+### DEMONSTRATION USAGE
+
+#The General graph button updates the graph and adds errors (for proof of concept more than anything)
+#The other buttons print to console.
+
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel
 from PyQt6.QtCore import Qt
+import pyqtgraph as pg
+import random
 
-## THIS IS A PROTOTYPE AND SHOULD BE CHANGED. I wanted to get this out so we had an idea for monday
+# Temporary solution to demonstrate the graph
+class NetworkMonitor:
+    def __init__(self):
+        self.data = [random.randint(1, 10) for _ in range(10)]  # Random resend counts
+        self.errors = 0
+        self.total_connections = 0
+    
+    def get_resend_data(self):
+        """Simulate fetching the latest resend count data."""
+        self.data = [random.randint(1, 10) for _ in range(10)]
+        return self.data
 
+    def get_errors(self):
+        """Simulate fetching errors count."""
+        self.errors += random.randint(0, 2)
+        return self.errors
+
+    def get_total_connections(self):
+        """Simulate fetching total connections count."""
+        self.total_connections += random.randint(1, 3)
+        return self.total_connections
+
+# Graph definition
+class GraphWidget(pg.PlotWidget):
+    def __init__(self, monitor):
+        super().__init__()
+        self.monitor = monitor
+        self.plot = self.plot(pen="b")  # Blue line
+        self.update_graph()  # Initialize graph
+
+    def update_graph(self):
+        """Fetch new data and refresh the graph."""
+        new_data = self.monitor.get_resend_data()
+        self.plot.setData(new_data)
+
+# Main window
 class CallMonitorApp(QMainWindow):
+    # Window setup
     def __init__(self):
         super().__init__()
         self.setWindowTitle("CallQual")
         self.setGeometry(100, 100, 1024, 512)
 
-        central_widget = QWidget()
-        layout = QVBoxLayout()
+        # PyQt setup
+        self.central_widget = QWidget()
+        self.main_layout = QHBoxLayout()  # Horizontal layout for left, middle, right
+        self.central_widget.setLayout(self.main_layout)
+        self.setCentralWidget(self.central_widget)
 
-        #I have to look more into layouts, I want the buttons on the left in the future.
+        # Left Layout (buttons)
+        self.left_layout = QVBoxLayout()  # Buttons on the left
+        self.main_layout.addLayout(self.left_layout)
 
-        # Error Button
-        self.error_button = QPushButton("Errors/Dropped Packets")
-        self.error_button.clicked.connect(self.show_errors)
-        layout.addWidget(self.error_button)
+        # Right Layout (metrics)
+        self.right_layout = QVBoxLayout()  # Metrics on the right
+        self.main_layout.addLayout(self.right_layout)
 
-        # Connection Quality Button
-        self.quality_button = QPushButton("Connection Quality")
-        self.quality_button.clicked.connect(self.show_quality)
-        layout.addWidget(self.quality_button)
+        # Graph setup (middle)
+        self.network_monitor = NetworkMonitor()  # Placeholder, but the idea
+        self.graph_widget = GraphWidget(self.network_monitor)  # Update with actual data
+        self.main_layout.addWidget(self.graph_widget)
 
-        # General Graph Button
-        self.graph_button = QPushButton("General Graph")
-        self.graph_button.clicked.connect(self.show_graph)
-        layout.addWidget(self.graph_button)
+        # Buttons
+        self.buttons = [
+            QPushButton("Errors/Dropped Packets"),
+            QPushButton("Connection Quality"),
+            QPushButton("General Graph"),
+            QPushButton("Overall Log / Wireshark"),
+            QPushButton("Settings"),
+        ]
 
-        # Wireshark Log Button
-        self.log_button = QPushButton("Overall Log / Wireshark")
-        self.log_button.clicked.connect(self.show_log)
-        layout.addWidget(self.log_button)
+        # Assigns *FUNCTION* behavior to buttons
+        self.buttons[0].clicked.connect(self.show_errors)
+        self.buttons[1].clicked.connect(self.show_quality)
+        self.buttons[2].clicked.connect(self.update_graph)
+        self.buttons[3].clicked.connect(self.show_log)
+        self.buttons[4].clicked.connect(self.show_settings)
 
-        # Status Label // We want to put a graph here
-        self.status_label = QLabel("Status: Monitoring...")
-        self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(self.status_label)
+        # Left layout (buttons)
+        for button in self.buttons:
+            self.left_layout.addWidget(button)
 
-        # Set Layout
-        central_widget.setLayout(layout)
-        self.setCentralWidget(central_widget)
+        # Right layout (metrics)
+        self.errors_label = QLabel(f"Errors: {self.network_monitor.get_errors()}")
+        self.total_connections_label = QLabel(f"Total Connections: {self.network_monitor.get_total_connections()}")
+        self.right_layout.addWidget(self.errors_label)
+        self.right_layout.addWidget(self.total_connections_label)
 
-    #We can open additional windows for mode context dpending on the button
+        # This makes it look like Wireshark
+        self.central_widget.setStyleSheet("""
+            QPushButton {
+                background-color: #3498db;
+                color: white;
+                border: 2px solid #2980b9;
+                border-radius: 4px;
+                padding: 2px 4px;
+                font-size: 12px;
+            }
+            QPushButton:hover {
+                background-color: #5dade2;
+            }
+            QPushButton:pressed {
+                background-color: #1f618d;
+            }
+            QLabel {
+                font-size: 14px;
+                margin: 10px;
+            }
+        """)
+
+    # Trigger manual graph update
+    def update_graph(self):
+        """Trigger manual graph update."""
+        print("Updating graph...")
+        self.graph_widget.update_graph()
+        self.update_metrics()
+
+    # Update metrics (errors and total connections)
+    def update_metrics(self):
+        """Update the metrics on the right side."""
+        self.errors_label.setText(f"Errors: {self.network_monitor.get_errors()}")
+        self.total_connections_label.setText(f"Total Connections: {self.network_monitor.get_total_connections()}")
+
+    # Dynamic resizing
+    def resizeEvent(self, event):
+        button_width = max(144, self.width() // 8)
+        button_height = max(52, self.height() // 10)
+
+        for button in self.buttons:
+            button.setFixedSize(button_width, button_height)
+
+    # Debug functions
     def show_errors(self):
-        print("Showing Errors/Dropped Packets")
-        error_window = QMainWindow(self)
-        error_window.setWindowTitle("Error Log")
-        error_window.setGeometry(200, 200, 400, 300)
-        error_window.show()
+        print("Showing errors...")
 
-    #These are all debug right now
     def show_quality(self):
-        print("Showing Connection Quality")
-
-    def show_graph(self):
-        print("Showing General Graph")
+        print("Showing quality...")
 
     def show_log(self):
-        print("Opening Overall Log / Wireshark")
+        print("Showing log...")
 
-# Consider moving this into the actual main class, as it would make development and integration easier.
-def main():
+    def show_settings(self):
+        print("Showing settings...")
+
+# Run the app
+if __name__ == "__main__":
     app = QApplication([])
     window = CallMonitorApp()
     window.show()
     app.exec()
-
-if __name__ == "__main__":
-    main()

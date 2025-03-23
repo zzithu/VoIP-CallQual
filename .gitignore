@@ -1,0 +1,6 @@
+#I do not own the sample captures, so I am ignoring them.
+# https://wiki.wireshark.org/samplecaptures#sip-and-rtp See here for examples
+
+
+ExampleCapture/*
+!*/
