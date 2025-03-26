@@ -18,12 +18,17 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHB
 from PyQt6.QtCore import Qt
 import pyqtgraph as pg
 import random
+from packetGatherer import PacketGatherer
 
 # Temporary solution to demonstrate the graph
 class NetworkMonitor:
     def __init__(self):
+        #initialize a packetGatherer
+        self.data = PacketGatherer()
+        self.data.gather_packets() #TODO 
+        self.df = self.data.get_Dataframe()
+
         #TODO add the actual data..
-        self.data = [random.randint(1, 10) for _ in range(10)]  # Random resend counts
         self.errors = 0
         self.total_connections = 0
     

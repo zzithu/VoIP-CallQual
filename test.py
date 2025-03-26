@@ -5,7 +5,7 @@ from pprint import pprint
 from packetGatherer import PacketGatherer
 import staticErrorDetection as SED
 
-#this is the testing class
+#this is the testing class // Reference this for usage and imports
 
 if __name__ == "__main__":
     packet_gatherer = PacketGatherer()
