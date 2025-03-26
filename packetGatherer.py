@@ -9,7 +9,9 @@ import pyshark
 import pandas as pd
 from pprint import pprint #pretty print, its nicer for debugging
 
+#TODO I think we need to flush the cap buffer as to not duplicate packets on live. 
 
+#This is the brains, we collect packets or we live capture them
 class PacketGatherer:
     def __init__(self, source='ExampleCapture/aaa.pcap'): #default packet to open
         self.source = source  
@@ -20,7 +22,7 @@ class PacketGatherer:
     #Mode specifies the source of packets. Use 'live' or 'file' for your needs
     def gather_packets(self, mode):
         if mode == 'live': #Live from eth0 (we can verify this later)
-            cap = pyshark.LiveCapture(interface='eth0')
+            cap = pyshark.LiveCapture(interface='eth0') #TODO ensure this is correct and works
         elif mode == 'file': #this is from the specified file above
             cap = pyshark.FileCapture(self.source)
         else:
@@ -37,6 +39,7 @@ class PacketGatherer:
 
     #rather than directly managing the frame, we can more easily call this for any machine training.
     def process_packet(self, packet):
+        #TODO Potentially if there is other information we want, create a reference to it here
         packet_info = {
             'timestamp': packet.sniff_time,  # Packet timestamp
             'source_ip': packet.ip.src if 'IP' in packet else None,  # Source IP
@@ -52,6 +55,7 @@ class PacketGatherer:
     def get_Dataframe(self):
         return self.df
 
+    #Adds additional packets, loop this
     def update_Dataframe(self, packet_info):
         self.df = self.df.append(packet_info, ignore_index=True)
 
@@ -61,7 +65,6 @@ class PacketGatherer:
     #this is responsible for seperating into the types of packets, we also get a nice little array to reference them
     def classify(self):
         self.classified = {}
-
 
         for pkt in self.packets:
             src_ip = pkt['source_ip']
@@ -92,7 +95,7 @@ class PacketGatherer:
             else:
                 self.classified[src_ip][conn_id]['other_packets'].append(pkt) #essentially, undefinied at least at the moment
 
-# This is how to use it
+# This is how to use it // See test.py for imports and additional usage
 if __name__ == "__main__":
     packet_gatherer = PacketGatherer("ExampleCapture/aaa.pcap")
 

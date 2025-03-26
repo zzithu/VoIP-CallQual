@@ -19,6 +19,7 @@ TODO -- This was originally thought of by @(name)
 --Packet gatherer may be missing fields in dataframe, if this is the case add them
 --Buttons on GUI need proper functionality >> Error logs should show errors packets, errors should update properly
 --Additional categories for organization. While this has been explored and the dictionary should cover this, they are not currently implemented
+--Since this is not tested, we may need to flush the packetgatherer buffer.
 
 ** This is not an exhaustive list, I just came up with these and there are likely more things that I may gloss over or just come as a result from testing **
 

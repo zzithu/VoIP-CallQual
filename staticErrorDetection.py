@@ -12,6 +12,8 @@
 
 # Specifically, we analyze timestamps, if there is a long gap, we assume there is a conneciton error
 def latencyError(packets, threshold_ms=200): #default 200, specify otherwise
+    #TODO Maybe mess around in case 200ms is too much, but likely this is the one case where an actual
+    #connection is busted. Source? I made it up
     errors = 0
     for i in range (1,len(packets)):
         time_diff = (packets[i]['timestamp'] - packets[i-1]['timestamp']).total_seconds() * 1000
@@ -22,7 +24,7 @@ def latencyError(packets, threshold_ms=200): #default 200, specify otherwise
 # Inspects packets for standard sip errors
 def sipErrors(packets):
     errors = 0
-
+    #TODO this can be done better, but this SHOULD work
     #birds nest
     for pkt in packets:
         if pkt['protocol'] == 'SIP':  # Make sure this is a SIP packet (otherwise test is meaningless)
@@ -42,7 +44,7 @@ def rtpErrors(packets):
     errors = 0
     for pkt in packets:
         if pkt['protocol'] == 'RTCP':
-            #place additional flags here
+            #TODO place additional flags here
             if 'nack' in pkt:
                 errors +=1
 
