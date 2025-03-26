@@ -4,7 +4,7 @@ This program focuses on packet analysis and anomaly detection in order to classi
 
 ## Creators
 
-TODO -- This was originally thought of by @(name) 
+TODO -- This was originally thought of by @Slopar
 
 
 ## TODO List 
