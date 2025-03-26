@@ -7,6 +7,8 @@
 
 import pyshark
 import pandas as pd
+from pprint import pprint #pretty print, its nicer for debugging
+
 
 class PacketGatherer:
     def __init__(self, source='ExampleCapture/aaa.pcap'): #default packet to open
@@ -15,13 +17,14 @@ class PacketGatherer:
         self.classified = {}
         self.df = pd.DataFrame()  # DataFrame for the processed data
 
-    def gather_packets(self):
-        
-        #This is live gatherign
-        # cap = pyshark.LiveCapture(interface='eth0')
-
-        #if you want to get a capture from a predetermined file
-        cap = pyshark.FileCapture(self.source)
+    #Mode specifies the source of packets. Use 'live' or 'file' for your needs
+    def gather_packets(self, mode):
+        if mode == 'live': #Live from eth0 (we can verify this later)
+            cap = pyshark.LiveCapture(interface='eth0')
+        elif mode == 'file': #this is from the specified file above
+            cap = pyshark.FileCapture(self.source)
+        else:
+            raise ValueError("Invalid mode. Please use 'live' or 'file'.")
 
         # Process the packets
         for packet in cap:
@@ -30,6 +33,7 @@ class PacketGatherer:
 
         # Convert to DataFrame
         self.df = pd.DataFrame(self.packets)
+        self.classify() #less work outside of this method
 
     #rather than directly managing the frame, we can more easily call this for any machine training.
     def process_packet(self, packet):
@@ -45,17 +49,17 @@ class PacketGatherer:
 
 
     #These will help for live updates
-    def get_dataframe(self):
+    def get_Dataframe(self):
         return self.df
 
-    def update_dataframe(self, packet_info):
+    def update_Dataframe(self, packet_info):
         self.df = self.df.append(packet_info, ignore_index=True)
 
 #In order to best categorize information, we can seperate into packet errors, and we can also seperate
 #based on the connection identity. Think databases.
 
     #this is responsible for seperating into the types of packets, we also get a nice little array to reference them
-    def classify_by_ip(self):
+    def classify(self):
         self.classified = {}
 
 
@@ -91,10 +95,14 @@ class PacketGatherer:
 # This is how to use it
 if __name__ == "__main__":
     packet_gatherer = PacketGatherer("ExampleCapture/aaa.pcap")
-    
-    #for live data, loop these
-    packet_gatherer.gather_packets()
 
-    df = packet_gatherer.get_dataframe()
-  
-    print(df.head())  
+    # For live data, loop these
+    packet_gatherer.gather_packets('file')
+
+    df = packet_gatherer.get_Dataframe()
+    print(df.head())
+
+    # Check classified data 
+    pprint(packet_gatherer.classified, width=120) #Use this for printing (MUCH nicer to look at, pretty print)
+
+    print("\n\n\n\n\n\n\n\n\n")

@@ -22,22 +22,23 @@ import random
 # Temporary solution to demonstrate the graph
 class NetworkMonitor:
     def __init__(self):
+        #TODO add the actual data..
         self.data = [random.randint(1, 10) for _ in range(10)]  # Random resend counts
         self.errors = 0
         self.total_connections = 0
     
     def get_resend_data(self):
-        """Simulate fetching the latest resend count data."""
+        #TODO update with actual data
         self.data = [random.randint(1, 10) for _ in range(10)]
         return self.data
 
     def get_errors(self):
-        """Simulate fetching errors count."""
+        #TODO We have this!
         self.errors += random.randint(0, 2)
         return self.errors
 
     def get_total_connections(self):
-        """Simulate fetching total connections count."""
+        #TODO implement this outside as well, or just count
         self.total_connections += random.randint(1, 3)
         return self.total_connections
 
