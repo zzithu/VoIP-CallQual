@@ -20,6 +20,7 @@ TODO -- This was originally thought of by @(name)
 --Buttons on GUI need proper functionality >> Error logs should show errors packets, errors should update properly
 --Additional categories for organization. While this has been explored and the dictionary should cover this, they are not currently implemented
 
+** This is not an exhaustive list, I just came up with these and there are likely more things that I may gloss over or just come as a result from testing **
 
 #### Message me with concerns or questions.
 
